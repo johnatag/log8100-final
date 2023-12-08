@@ -32,11 +32,11 @@ source "proxmox-iso" "ubuntu-server-jammy" {
     username = "${var.proxmox_api_token_id}"
     token = "${var.proxmox_api_token_secret}"
     # (Optional) Skip TLS Verification
-    # insecure_skip_tls_verify = true
+    insecure_skip_tls_verify = true
     
     # VM General Settings
     node = "pve"
-    vm_id = "100"
+    vm_id = "900"
     vm_name = "ubuntu-server-jammy"
     template_description = "Ubuntu Server jammy Image"
 
@@ -58,7 +58,6 @@ source "proxmox-iso" "ubuntu-server-jammy" {
 
     disks {
         disk_size = "32G"
-        format = "qcow2"
         storage_pool = "Storage"
         type = "virtio"
     }

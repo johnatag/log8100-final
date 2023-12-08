@@ -6,7 +6,7 @@ autoinstall:
     layout: us
   ssh:
     install-server: true
-    allow-pw: false
+    allow-pw: true
     disable_root: true
     ssh_quiet_keygen: true
     allow_public_ssh_keys: true
