@@ -143,11 +143,11 @@ build {
         inline = [ "sudo cp /tmp/99-pve.cfg /etc/cloud/cloud.cfg.d/99-pve.cfg" ]
     }
 
-    provisioner "shell" {
-        script = "files/ubuntu_hardening.sh"
-        pause_before = "5s"
-        timeout      = "5s"
-    }
+    # provisioner "shell" {
+    #     script = "files/ubuntu_hardening.sh"
+    #     pause_before = "5s"
+    #     timeout      = "5s"
+    # }
 
     # Provisioning the VM Template with Docker Installation #4
     # provisioner "shell" {
