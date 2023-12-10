@@ -41,7 +41,7 @@ variable "num_k3s_masters_mem" {
 }
 
 variable "num_k3s_nodes" {
-  default = 2
+  default = 1
 }
 
 variable "num_k3s_nodes_mem" {
