@@ -65,5 +65,5 @@ variable "networkrange" {
 }
 
 variable "gateway" {
-  default = "192.168.3.1"
+  default = "192.168.2.1"
 }
