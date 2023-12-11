@@ -1,37 +1,14 @@
-# Proxmox Full-Clone
-# ---
-# Create a new VM from a clone
 resource "proxmox_vm_qemu" "proxmox_vm_master" {
-
-  # VM General Settings
-  target_node = "pve"
-  name        = "k3s-master-${count.index}"
-  desc        = "k3s master node"
   count       = var.num_k3s_masters
+  name        = "k3s-master-${count.index}"
+  target_node = var.pm_node_name
+  clone       = var.template_vm_name
+  os_type     = "cloud-init"
+  agent       = 1
+  memory      = var.num_k3s_masters_mem
+  cores       = 4
 
-  # VM OS Settings
-  clone = var.template_vm_name
-
-  # VM System Settings
-  agent = 1
-
-  # VM CPU Settings
-  cores   = 2
-
-  # VM Memory Settings
-  memory = var.num_k3s_masters_mem
-
-  # VM Cloud-Init Settings
-  os_type = "cloud-init"
-
-  # (Optional) IP Address and Gateway
   ipconfig0 = "ip=${var.master_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
-
-  # (Optional) Default User
-  # ciuser = "your-username"
-
-  # (Optional) Add your SSH KEY
-  sshkeys = var.ssh_public_key
 
   lifecycle {
     ignore_changes = [
@@ -41,35 +18,20 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
       network
     ]
   }
+
 }
 
 resource "proxmox_vm_qemu" "proxmox_vm_workers" {
-
-  # VM General Settings
-  target_node = var.pm_node_name
-  name        = "k3s-worker-${count.index}"
-  desc        = "k3s worker node"
   count       = var.num_k3s_nodes
-
-  # VM OS Settings
+  name        = "k3s-worker-${count.index}"
+  target_node = var.pm_node_name
   clone       = var.template_vm_name
-
-  # VM System Settings
+  os_type     = "cloud-init"
   agent       = 1
-
-  # VM CPU Settings
-  cores       = 2
-
-  # VM Memory Settings
   memory      = var.num_k3s_nodes_mem
+  cores       = 4
 
-  # VM Cloud-Init Settings
-  os_type = "cloud-init"
-
-  # IP Address and Gateway
   ipconfig0 = "ip=${var.worker_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
-
-  sshkeys = var.ssh_public_key
 
   lifecycle {
     ignore_changes = [
@@ -79,6 +41,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
       network
     ]
   }
+
 }
 
 data "template_file" "k8s" {
@@ -91,10 +54,10 @@ data "template_file" "k8s" {
 
 resource "local_file" "k8s_file" {
   content  = data.template_file.k8s.rendered
-  filename = "../ansible/inventory/my-cluster/hosts.ini"
+  filename = "../inventory/my-cluster/hosts.ini"
 }
 
 resource "local_file" "var_file" {
-  source   = "../ansible/inventory/sample/group_vars/all.yml"
-  filename = "../ansible/inventory/my-cluster/group_vars/all.yml"
+  source   = "../inventory/sample/group_vars/all.yml"
+  filename = "../inventory/my-cluster/group_vars/all.yml"
 }
