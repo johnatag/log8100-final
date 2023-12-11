@@ -37,9 +37,13 @@ resource "proxmox_vm_qemu" "vm_master" {
 
     # (Optional) IP Address and Gateway
     ipconfig0 = "ip=${var.master_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
-
+    nameserver = var.gateway
+    ciuser = "user"
+    
     # (Optional) Add your SSH KEY
-    #sshkeys = var.ssh_public_key
+    sshkeys = <<EOF
+    ${var.ssh_public_key}
+    EOF
 }
 
 
