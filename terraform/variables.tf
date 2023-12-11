@@ -18,11 +18,6 @@ variable "pm_tls_insecure" {
   default     = false
 }
 
-variable "pm_host" {
-  description = "The hostname or IP of the proxmox server"
-  type        = string
-}
-
 variable "pm_node_name" {
   description = "name of the proxmox node to create the VMs on"
   type        = string

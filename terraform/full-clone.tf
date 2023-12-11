@@ -5,7 +5,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
 
   # VM General Settings
   target_node = "pve"
-  vmid        = "401"
+  vmid        = 401
   name        = "k3s-master-${count.index}"
   desc        = "k3s master node"
   count       = var.num_k3s_masters
@@ -94,9 +94,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
   # IP Address and Gateway
   ipconfig0 = "ip=${var.worker_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
 
-  sshkeys = <<EOF
-    ${var.ssh_public_key}
-    EOF
+  sshkeys = var.ssh_public_key
 
   lifecycle {
     ignore_changes = [

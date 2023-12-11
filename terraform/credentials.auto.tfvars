@@ -10,7 +10,7 @@ ssh_public_key = ""
 num_k3s_masters = 1
 num_k3s_nodes = 1
 num_k3s_masters_mem = 4096
-num_k3s_nodes_mem = 4096
+num_k3s_nodes_mem = 2048
 
 template_vm_name = "ubuntu-server-jammy"
 
