@@ -1,4 +1,4 @@
-resource "proxmox_vm_qemu" "vm_master" {
+resource "proxmox_vm_qemu" "proxmox_vm_master" {
   
     count = var.num_k3s_masters
 
@@ -39,7 +39,7 @@ resource "proxmox_vm_qemu" "vm_master" {
     ipconfig0 = "ip=${var.master_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
     nameserver = var.gateway
     ciuser = "user"
-    
+
     # (Optional) Add your SSH KEY
     sshkeys = <<EOF
     ${var.ssh_public_key}
