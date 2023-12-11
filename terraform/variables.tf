@@ -32,7 +32,7 @@ variable "num_k3s_masters" {
 }
 
 variable "num_k3s_masters_mem" {
-  default = "4096"
+  default = 4096
 }
 
 variable "num_k3s_nodes" {
@@ -40,7 +40,7 @@ variable "num_k3s_nodes" {
 }
 
 variable "num_k3s_nodes_mem" {
-  default = "4096"
+  default = 4096
 }
 
 variable "template_vm_name" {
