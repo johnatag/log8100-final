@@ -33,7 +33,7 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
     }
 
     # VM Cloud-Init Settings
-    os_type = "cloud-init"
+    #os_type = "cloud-init"
 
     # (Optional) IP Address and Gateway
     ipconfig0 = "ip=${var.master_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
