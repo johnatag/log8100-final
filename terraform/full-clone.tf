@@ -5,13 +5,9 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
 
   # VM General Settings
   target_node = "pve"
-  vmid        = 401
   name        = "k3s-master-${count.index}"
   desc        = "k3s master node"
   count       = var.num_k3s_masters
-
-  # VM Advanced General Settings
-  onboot = true
 
   # VM OS Settings
   clone = var.template_vm_name
@@ -21,17 +17,9 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
 
   # VM CPU Settings
   cores   = 2
-  sockets = 1
-  cpu     = "host"
 
   # VM Memory Settings
   memory = var.num_k3s_masters_mem
-
-  # VM Network Settings
-  network {
-    bridge = "vmbr0"
-    model  = "virtio"
-  }
 
   # VM Cloud-Init Settings
   os_type = "cloud-init"
@@ -45,14 +33,14 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
   # (Optional) Add your SSH KEY
   sshkeys = var.ssh_public_key
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     ciuser,
-  #     sshkeys,
-  #     disk,
-  #     network
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      ciuser,
+      sshkeys,
+      disk,
+      network
+    ]
+  }
 }
 
 resource "proxmox_vm_qemu" "proxmox_vm_workers" {
@@ -63,9 +51,6 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
   desc        = "k3s worker node"
   count       = var.num_k3s_nodes
 
-  # VM Advanced General Settings
-  onboot = true
-
   # VM OS Settings
   clone       = var.template_vm_name
 
@@ -74,34 +59,26 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
 
   # VM CPU Settings
   cores       = 2
-  sockets     = 1
-  cpu         = "host"
 
   # VM Memory Settings
   memory      = var.num_k3s_nodes_mem
 
   # VM Cloud-Init Settings
   os_type = "cloud-init"
-  
-  # VM Network Settings
-  network {
-    bridge = "vmbr0"
-    model = "virtio"
-  }
 
   # IP Address and Gateway
   ipconfig0 = "ip=${var.worker_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
 
   sshkeys = var.ssh_public_key
 
-  # lifecycle {
-  #   ignore_changes = [
-  #     ciuser,
-  #     sshkeys,
-  #     disk,
-  #     network
-  #   ]
-  # }
+  lifecycle {
+    ignore_changes = [
+      ciuser,
+      sshkeys,
+      disk,
+      network
+    ]
+  }
 }
 
 data "template_file" "k8s" {
