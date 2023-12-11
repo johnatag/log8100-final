@@ -43,18 +43,16 @@ resource "proxmox_vm_qemu" "proxmox_vm_master" {
   # ciuser = "your-username"
 
   # (Optional) Add your SSH KEY
-  sshkeys = <<EOF
-    ${var.ssh_public_key}
-    EOF
+  sshkeys = var.ssh_public_key
 
-  lifecycle {
-    ignore_changes = [
-      ciuser,
-      sshkeys,
-      disk,
-      network
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     ciuser,
+  #     sshkeys,
+  #     disk,
+  #     network
+  #   ]
+  # }
 }
 
 resource "proxmox_vm_qemu" "proxmox_vm_workers" {
@@ -81,6 +79,9 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
 
   # VM Memory Settings
   memory      = var.num_k3s_nodes_mem
+
+  # VM Cloud-Init Settings
+  os_type = "cloud-init"
   
   # VM Network Settings
   network {
@@ -88,22 +89,19 @@ resource "proxmox_vm_qemu" "proxmox_vm_workers" {
     model = "virtio"
   }
 
-  # VM Cloud-Init Settings
-  os_type = "cloud-init"
-
   # IP Address and Gateway
   ipconfig0 = "ip=${var.worker_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
 
   sshkeys = var.ssh_public_key
 
-  lifecycle {
-    ignore_changes = [
-      ciuser,
-      sshkeys,
-      disk,
-      network
-    ]
-  }
+  # lifecycle {
+  #   ignore_changes = [
+  #     ciuser,
+  #     sshkeys,
+  #     disk,
+  #     network
+  #   ]
+  # }
 }
 
 data "template_file" "k8s" {
