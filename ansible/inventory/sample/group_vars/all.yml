@@ -5,7 +5,7 @@ master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(groups['m
 extra_server_args: "--write-kubeconfig-mode=644"
 extra_agent_args: ""
 copy_kubeconfig: true
-metallb: false
+metallb: true
 metallb_version: "v0.12.1"
 metallb_range: "192.168.2.93-192.168.2.194"
 argocd: false
