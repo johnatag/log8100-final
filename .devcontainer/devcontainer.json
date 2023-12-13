@@ -13,7 +13,8 @@
 			"extensions": [
 				"4ops.packer",
 				"HashiCorp.terraform",
-				"HashiCorp.HCL"
+				"HashiCorp.HCL",
+				"ms-kubernetes-tools.vscode-kubernetes-tools"
 			]
 		}
 	}

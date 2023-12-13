@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: juicebox
+spec:
+ replicas: 1
+ selector:
+   matchLabels:
+     app: juicebox
+ template:
+   metadata:
+     labels:
+       app: juicebox
+   spec:
+     containers:
+     - name: juicebox
+       image: floatdocka/juicebox-log8100
+       ports:
+       - containerPort: 3000
+       resources:
+        limits:
+          cpu: "500m"
+          memory: "512Mi"
+        requests:
+          cpu: "250m"
+          memory: "256Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: juicebox
+spec:
+ type: LoadBalancer
+ ports:
+ - port: 80
+   targetPort: 3000
+ selector:
+   app: juicebox
