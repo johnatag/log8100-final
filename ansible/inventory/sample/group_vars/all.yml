@@ -7,7 +7,7 @@ extra_agent_args: ""
 copy_kubeconfig: true
 metallb: false
 metallb_version: "v0.12.1"
-metallb_range: "192.168.2.93-192.168.2.94"
+metallb_range: "192.168.2.93-192.168.2.194"
 argocd: false
 argocd_service_type: LoadBalancer
 dns_servers: []
