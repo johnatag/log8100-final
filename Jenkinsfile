@@ -38,7 +38,7 @@ pipeline {
                 docker.image('bridgecrew/checkov:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                     unstash 'my-terraform-code'
                     try {
-                        sh 'checkov -d .-o cli -o junitxml --output-file-path console,checkov_scan.xml --repo-id johnatag/log8100-final --branch main'
+                        sh 'checkov -d . -o cli -o junitxml --output-file-path console,checkov_scan.xml --repo-id johnatag/log8100-final --branch main'
                         junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
                     } catch (err) {
                         junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
