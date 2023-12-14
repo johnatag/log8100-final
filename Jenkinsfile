@@ -156,10 +156,10 @@ pipeline {
             }
         }
     }
+ }
 
    options {
          preserveStashes()
          timestamps()
     }
- }
 }
