@@ -6,12 +6,12 @@
     - role: prereq
     - role: download
     - role: raspberrypi
+    - role: postconfig/localhost
 
 - hosts: master
   become: true
   roles:
     - role: k3s/master
-    - role: postconfig/localhost
 
 - hosts: node
   become: true
