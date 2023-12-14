@@ -24,6 +24,9 @@ pipeline {
                     }
                 }
             }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
+            }
         }
         post {
             always {
@@ -45,6 +48,9 @@ pipeline {
                         throw err
                     }
                 }
+            }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
             }
         }
         post {
@@ -69,6 +75,9 @@ pipeline {
                     }
                 }
             }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
+            }
         }
         post {
             always {
@@ -84,6 +93,9 @@ pipeline {
                     unstash 'my-terraform-code'
                     sh 'terraform fmt -chdir=/data -diff > terraform.diff'
                 }
+            }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
             }
         }
         post {
@@ -119,6 +131,9 @@ pipeline {
                   docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${env.BUILD_ID} -o json > trivy.json
                '''
             }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
+            }
         }
         post {
             always {
@@ -134,6 +149,9 @@ pipeline {
                   docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${env.BUILD_ID} > clair.json
                '''
             }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
+            }
         }
         post {
             always {
@@ -148,6 +166,9 @@ pipeline {
                sh '''
                   docker run -t owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html
                '''
+            }
+            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                // Your commands here
             }
         }
         post {
