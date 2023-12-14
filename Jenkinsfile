@@ -20,7 +20,4 @@ pipeline {
          }
      }
  }
- options {
-   git(branch: 'main')
- }
 }
