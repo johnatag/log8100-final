@@ -32,11 +32,10 @@ pipeline {
         }
     }
 
-
     stage('Checkov scan') {
         steps {
             script {
-                docker.image('bridgecrew/checkov:latest').inside("--entrypoint=''") {
+                docker.image('bridgecrew/checkov:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                     unstash 'my-terraform-code'
                     try {
                         sh 'checkov -d . --use-enforcement-rules -o cli -o junitxml --output-file-path console,checkov_scan.xml --repo-id johnatag/log8100-final --branch main'
@@ -59,7 +58,7 @@ pipeline {
     stage('Terrascan scan') {
         steps {
             script {
-                docker.image('accuknox/terrascan:latest').inside("--entrypoint=''") {
+                docker.image('accuknox/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                     unstash 'my-terraform-code'
                     try {
                         sh 'terrascan scan -t terraform -d . -o junitxml -o console -i terraform -r terrascan.xml'
@@ -81,7 +80,7 @@ pipeline {
     stage('Terraform fmt') {
         steps {
             script {
-                docker.image('hashicorp/terraform:latest').inside("--entrypoint=''") {
+                docker.image('hashicorp/terraform:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                     unstash 'my-terraform-code'
                     sh 'terraform fmt -chdir=/data -diff > terraform.diff'
                 }
