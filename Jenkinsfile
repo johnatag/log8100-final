@@ -5,7 +5,7 @@ pipeline {
 
     stage('Stash Terraform code') {
         steps {
-            git 'https://github.com/johnatag/log8100-final.git', branch: 'main'
+            git url: 'https://github.com/johnatag/log8100-final.git', branch: 'main'
             stash includes: 'terraform/**', name: 'my-terraform-code'
         }
     }
