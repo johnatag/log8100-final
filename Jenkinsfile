@@ -12,20 +12,20 @@ pipeline {
 
     stage('TFLint scan') {
         steps {
-            script {
-                docker.image('ghcr.io/terraform-linters/tflint:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
-                    unstash 'my-terraform-code'
-                    try {
-                        sh 'tflint --init > tflint.xml'
-                        junit skipPublishingChecks: true, testResults: 'tflint.xml'
-                    } catch (err) {
-                        junit skipPublishingChecks: true, testResults: 'tflint.xml'
-                        throw err
-                    }
-                }
-            }
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    docker.image('ghcr.io/terraform-linters/tflint:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
+                        unstash 'my-terraform-code'
+                        try {
+                            sh 'tflint --init > tflint.xml'
+                            junit skipPublishingChecks: true, testResults: 'tflint.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'tflint.xml'
+                            throw err
+                        }
+                    }
+                }
             }
         }
         post {
@@ -37,20 +37,21 @@ pipeline {
 
     stage('Checkov scan') {
         steps {
-            script {
-                docker.image('bridgecrew/checkov:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
-                    unstash 'my-terraform-code'
-                    try {
-                        sh 'checkov -d . -o cli -o junitxml --output-file-path console,checkov_scan.xml --repo-id johnatag/log8100-final --branch main'
-                        junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
-                    } catch (err) {
-                        junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
-                        throw err
-                    }
-                }
-            }
+            
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    docker.image('bridgecrew/checkov:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
+                        unstash 'my-terraform-code'
+                        try {
+                            sh 'checkov -d . -o cli -o junitxml --output-file-path console,checkov_scan.xml --repo-id johnatag/log8100-final --branch main'
+                            junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'checkov_scan.xml'
+                            throw err
+                        }
+                    }
+                }
             }
         }
         post {
@@ -63,20 +64,20 @@ pipeline {
 
     stage('Terrascan scan') {
         steps {
-            script {
-                docker.image('accuknox/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
-                    unstash 'my-terraform-code'
-                    try {
-                        sh 'terrascan scan -t terraform -d . -o junitxml -o console -i terraform -r terrascan.xml'
-                        junit skipPublishingChecks: true, testResults: 'terrascan.xml'
-                    } catch (err) {
-                        junit skipPublishingChecks: true, testResults: 'terrascan.xml'
-                        throw err
-                    }
-                }
-            }
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    docker.image('accuknox/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
+                        unstash 'my-terraform-code'
+                        try {
+                            sh 'terrascan scan -t terraform -d . -o junitxml -o console -i terraform -r terrascan.xml'
+                            junit skipPublishingChecks: true, testResults: 'terrascan.xml'
+                        } catch (err) {
+                            junit skipPublishingChecks: true, testResults: 'terrascan.xml'
+                            throw err
+                        }
+                    }
+                }
             }
         }
         post {
@@ -88,14 +89,15 @@ pipeline {
 
     stage('Terraform fmt') {
         steps {
-            script {
-                docker.image('hashicorp/terraform:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
-                    unstash 'my-terraform-code'
-                    sh 'terraform fmt -chdir=/data -diff > terraform.diff'
-                }
-            }
+            
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    docker.image('hashicorp/terraform:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
+                        unstash 'my-terraform-code'
+                        sh 'terraform fmt -chdir=/data -diff > terraform.diff'
+                    }
+                }
             }
         }
         post {
