@@ -4,11 +4,8 @@ pipeline {
  stages {
 
     stage('Stash Terraform code') {
-        when {
-            branch 'main'
-        }
         steps {
-            git 'https://github.com/johnatag/log8100-final.git'
+            git 'https://github.com/johnatag/log8100-final.git', branch: 'main'
             stash includes: 'terraform/**', name: 'my-terraform-code'
         }
     }
@@ -16,7 +13,7 @@ pipeline {
     stage('TFLint scan') {
         steps {
             script {
-                docker.image('ghcr.io/terraform-linters/tflint:latest').inside("--entrypoint=''") {
+                docker.image('ghcr.io/terraform-linters/tflint:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                     unstash 'my-terraform-code'
                     try {
                         sh 'tflint --init > tflint.xml'
@@ -30,10 +27,11 @@ pipeline {
         }
         post {
             always {
-               archiveArtifacts artifacts: 'tflint.xml', fingerprint: true
+                archiveArtifacts artifacts: 'tflint.xml', fingerprint: true
             }
         }
     }
+
 
     stage('Checkov scan') {
         steps {
