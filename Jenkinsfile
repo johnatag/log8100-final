@@ -146,8 +146,8 @@ stage('Clair Scan') {
            // Your commands here
            script {
                sh '''
-                    sh 'docker compose up -d'
-                    sh 'docker-compose exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}'
+                    sh docker compose up -d
+                    sh docker-compose exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}
                '''
            }
        }
