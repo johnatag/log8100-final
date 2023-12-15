@@ -124,41 +124,42 @@ pipeline {
         }
     }
 
-    stage('Trivy Scan') {
-        steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                // Your commands here
-                script {
-                    sh '''
-                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${env.BUILD_ID} -o json > trivy.json
-                    '''
-                }
-            } 
-        }
-        post {
-            always {
-               archiveArtifacts artifacts: 'trivy.json', fingerprint: true
-            }
-        }
-    }
+stage('Trivy Scan') {
+   steps {
+       catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+           // Your commands here
+           script {
+               sh '''
+                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${BUILD_ID} -o json > trivy.json
+               '''
+           }
+       } 
+   }
+   post {
+       always {
+          archiveArtifacts artifacts: 'trivy.json', fingerprint: true
+       }
+   }
+}
 
-    stage('Clair Scan') {
-        steps {
-            catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                // Your commands here
-                script {
-                    sh '''
-                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${env.BUILD_ID} > clair.json
-                    '''
-                }
-            }
-        }
-        post {
-            always {
-               archiveArtifacts artifacts: 'clair.json', fingerprint: true
-            }
-        }
-    }
+stage('Clair Scan') {
+   steps {
+       catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+           // Your commands here
+           script {
+               sh '''
+                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${BUILD_ID} > clair.json
+               '''
+           }
+       }
+   }
+   post {
+       always {
+          archiveArtifacts artifacts: 'clair.json', fingerprint: true
+       }
+   }
+}
+
 
     stage('ZAP Scan') {
         steps {
@@ -167,7 +168,7 @@ pipeline {
                 // Your commands here
                 script {
                     sh '''
-                        docker run -t owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html
+                        docker run -t -v ${pwd}:/zap/wrk owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html                    
                     '''
                 }
             }
