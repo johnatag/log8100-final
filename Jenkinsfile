@@ -71,7 +71,7 @@ pipeline {
                         unstash 'my-terraform-code'
                         try {
                             sh 'terrascan init'
-                            sh 'terrascan scan'
+                            sh 'terrascan scan -x console -o junit-xml'
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
                         } catch (err) {
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
@@ -146,8 +146,7 @@ stage('Clair Scan') {
            // Your commands here
            script {
                sh '''
-                    sh 'docker-compose -f clair/docker-compose-data/docker-compose.yml exec clairctl clairctl analyze -l juicebox-log8100:${BUILD_ID}'
-                    sh 'docker-compose -f clair/docker-compose-data/docker-compose.yml exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}'
+                    sh 'docker-compose exec clairctl clairctl report --config config.yml --host  juicebox-log8100:${BUILD_ID}'
                '''
            }
        }
