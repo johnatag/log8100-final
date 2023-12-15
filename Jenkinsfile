@@ -110,15 +110,9 @@ pipeline {
     stage('Build and Push') {
         steps {
             script {
-              dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
-              docker.withRegistry('https://hub.docker.com', 'dockerhub') {
-                try {
-                    dockerImage.push()
-                    dockerImage.push("latest")
-                } catch (e) {
-                    echo "An error occurred: ${e}"
-                }
-              }
+                dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
+                dockerImage.push()
+                dockerImage.push("latest")
             }
         }
     }
