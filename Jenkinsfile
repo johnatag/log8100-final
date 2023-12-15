@@ -67,7 +67,7 @@ pipeline {
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
                 script {
-                    docker.image('tenable/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100 -e HOME=/var/jenkins_home") {
+                    docker.image('tenable/terrascan:latest').inside("--entrypoint='' -u root -w /var/jenkins_home/workspace/log8100 -e HOME=/var/jenkins_home") {
                         unstash 'my-terraform-code'
                         try {
                             sh 'terrascan init'
@@ -146,8 +146,8 @@ stage('Clair Scan') {
            // Your commands here
            script {
                sh '''
-                    sh 'docker-compose -f ./clair/docker-compose-data/docker-compose.yml exec clairctl clairctl analyze -l juicebox-log8100:${BUILD_ID}'
-                    sh 'docker-compose -f ./clair/docker-compose-data/docker-compose.yml exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}'
+                    sh 'docker-compose -f clair/docker-compose-data/docker-compose.yml exec clairctl clairctl analyze -l juicebox-log8100:${BUILD_ID}'
+                    sh 'docker-compose -f clair/docker-compose-data/docker-compose.yml exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}'
                '''
            }
        }
