@@ -110,10 +110,9 @@ pipeline {
     stage('Build and Push') {
         steps {
             script {
-                dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
-                
                 docker.withRegistry('', 'dockerhub') {
                     try {
+                        dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
                         dockerImage.push()
                         dockerImage.push("latest")
                     } catch (e) {
