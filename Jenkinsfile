@@ -70,7 +70,7 @@ pipeline {
                     docker.image('tenable/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                         unstash 'my-terraform-code'
                         try {
-                            sh 'terrascan scan . -o juni-xml -x console'
+                            sh 'terrascan scan -d . -o juni-xml -x console'
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
                         } catch (err) {
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
@@ -168,7 +168,7 @@ stage('Clair Scan') {
                 // Your commands here
                 script {
                     sh '''
-                        docker run -t -v ${pwd}:/zap/wrk owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html                    
+                        docker run -t -v ${WORKSPACE}:/zap/wrk owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html                    
                     '''
                 }
             }
