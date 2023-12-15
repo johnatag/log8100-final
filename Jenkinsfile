@@ -1,6 +1,10 @@
 pipeline {
  agent any
-
+ 
+ environment {
+    DISCORD_WEBHOOK = credentials('webhook_url')
+ }
+ 
  stages {
 
     stage('Stash Terraform code') {
@@ -192,6 +196,16 @@ stage('Clair Scan') {
         }
     }
  }
+
+    post {
+        success {
+            discordSend description: "Jenkins Pipeline Build", footer: "Deployment completed successfully", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+    
+        failure {
+            discordSend description: "Jenkins Pipeline Error", footer: "Deployment failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+    }
 
    options {
          preserveStashes()
