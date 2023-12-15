@@ -70,7 +70,7 @@ pipeline {
                     docker.image('tenable/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                         unstash 'my-terraform-code'
                         try {
-                            sh 'sudo terrascan scan -d . -o juni-xml -x console'
+                            sh 'terrascan scan'
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
                         } catch (err) {
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
@@ -140,6 +140,7 @@ pipeline {
 
 stage('Clair Scan') {
    steps {
+        echo "${WORKSPACE}"
        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
            // Your commands here
            script {
