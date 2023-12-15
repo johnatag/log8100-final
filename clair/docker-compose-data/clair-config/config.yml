@@ -1,0 +1,29 @@
+clair:
+ database:
+   type: pgsql
+   options:
+     source: postgresql://clair:ChangeMe@postgres:5432/clair?sslmode=disable
+     cachesize: 16384
+ api:
+   port: 6060
+   healthport: 6061
+   timeout: 900s
+ updater:
+   interval: 2h
+ notifier:
+   attempts: 3
+   renotifyinterval: 2h
+ introspection_addr: :8089
+ http_listen_addr: :8080
+ log_level: debug
+ indexer:
+   connstring: host=clairv4-postgres port=5432 dbname=clair user=postgres password=postgres sslmode=disable
+   scanlock_retry: 10
+   layer_scan_concurrency: 5
+   migrations: true
+ matcher:
+   connstring: host=clairv4-postgres port=5432 dbname=clair user=postgres password=postgres sslmode=disable
+   max_conn_pool: 100
+   run: ""
+   migrations: true
+   indexer_addr: clair-indexer

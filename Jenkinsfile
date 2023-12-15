@@ -70,7 +70,7 @@ pipeline {
                     docker.image('tenable/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                         unstash 'my-terraform-code'
                         try {
-                            sh 'terrascan scan -d . -o juni-xml -x console'
+                            sh 'sudo terrascan scan -d . -o juni-xml -x console'
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
                         } catch (err) {
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
@@ -107,15 +107,11 @@ pipeline {
         }
     }
 
-    stage('Build and Push') {
+    stage('Build') {
         steps {
             script {
                 try {
                     dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
-                    docker.withRegistry('', 'dockerhub') {
-                        dockerImage.push()
-                        dockerImage.push("latest")
-                    }
                 } catch (e) {
                     echo "An error occured: ${e}"
                 }
@@ -124,23 +120,23 @@ pipeline {
         }
     }
 
-stage('Trivy Scan') {
-   steps {
-       catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-           // Your commands here
-           script {
-               sh '''
-                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${BUILD_ID} -o json > trivy.json
-               '''
-           }
-       } 
-   }
-   post {
-       always {
-          archiveArtifacts artifacts: 'trivy.json', fingerprint: true
-       }
-   }
-}
+    stage('Trivy Scan') {
+    steps {
+        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+            // Your commands here
+            script {
+                sh '''
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${BUILD_ID} -o json > trivy.json
+                '''
+            }
+        } 
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'trivy.json', fingerprint: true
+        }
+    }
+    }
 
 stage('Clair Scan') {
    steps {
@@ -148,7 +144,8 @@ stage('Clair Scan') {
            // Your commands here
            script {
                sh '''
-                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${BUILD_ID} > clair.json
+                    sh 'docker-compose -f ${WORKSPACE}/clair/docker-compose-data/docker-compose.yml exec clairctl clairctl analyze -l juicebox-log8100:${BUILD_ID}'
+                    sh 'docker-compose -f ${WORKSPACE}/clair/docker-compose-data/docker-compose.yml exec clairctl clairctl report -l juicebox-log8100:${BUILD_ID}'
                '''
            }
        }
@@ -159,7 +156,20 @@ stage('Clair Scan') {
        }
    }
 }
-
+    stage('Push') {
+        steps {
+            script {
+                try {
+                    docker.withRegistry('', 'dockerhub') {
+                            dockerImage.push()
+                            dockerImage.push("latest")
+                    }
+                } catch (e) {
+                    echo "An error occured: ${e}"
+                }
+            }
+        }
+    }
 
     stage('ZAP Scan') {
         steps {
