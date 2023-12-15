@@ -67,10 +67,10 @@ pipeline {
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
                 script {
-                    docker.image('accuknox/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
+                    docker.image('tenable/terrascan:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                         unstash 'my-terraform-code'
                         try {
-                            sh 'terrascan scan -t terraform -d . -o junitxml -o console -i terraform -r terrascan.xml'
+                            sh 'terrascan scan . -o juni-xml -x console'
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
                         } catch (err) {
                             junit skipPublishingChecks: true, testResults: 'terrascan.xml'
@@ -95,7 +95,7 @@ pipeline {
                 script {
                     docker.image('hashicorp/terraform:latest').inside("--entrypoint='' -w /var/jenkins_home/workspace/log8100") {
                         unstash 'my-terraform-code'
-                        sh 'terraform fmt -chdir=/data -diff > terraform.diff'
+                        sh 'terraform fmt -recursive -diff > terraform.diff'
                     }
                 }
             }
@@ -107,17 +107,10 @@ pipeline {
         }
     }
 
-    stage('Build') {
+    stage('Build and Push') {
         steps {
             script {
               dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
-            }
-        }
-    }
-
-    stage('Push') {
-        steps {
-            script {
               docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
                 dockerImage.push()
                 dockerImage.push("latest")
@@ -128,14 +121,14 @@ pipeline {
 
     stage('Trivy Scan') {
         steps {
-            script {
-               sh '''
-                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${env.BUILD_ID} -o json > trivy.json
-               '''
-            }
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
-            }
+                script {
+                    sh '''
+                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image floatdocka/juicebox-log8100:${env.BUILD_ID} -o json > trivy.json
+                    '''
+                }
+            } 
         }
         post {
             always {
@@ -146,13 +139,13 @@ pipeline {
 
     stage('Clair Scan') {
         steps {
-            script {
-               sh '''
-                  docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${env.BUILD_ID} > clair.json
-               '''
-            }
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    sh '''
+                        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock arminc/clair-local-scan:latest floatdocka/juicebox-log8100:${env.BUILD_ID} > clair.json
+                    '''
+                }
             }
         }
         post {
@@ -164,13 +157,14 @@ pipeline {
 
     stage('ZAP Scan') {
         steps {
-            script {
-               sh '''
-                  docker run -t owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html
-               '''
-            }
+            
             catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                 // Your commands here
+                script {
+                    sh '''
+                        docker run -t owasp/zap2docker-stable zap-baseline.py -t https://demo.owasp-juice.shop/ -r zap.html
+                    '''
+                }
             }
         }
         post {
