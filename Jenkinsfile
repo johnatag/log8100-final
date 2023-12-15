@@ -111,7 +111,7 @@ pipeline {
         steps {
             script {
               dockerImage = docker.build("floatdocka/juicebox-log8100:${env.BUILD_ID}")
-              docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+              docker.withRegistry('https://hub.docker.com', 'dockerhub') {
                 try {
                     dockerImage.push()
                     dockerImage.push("latest")
