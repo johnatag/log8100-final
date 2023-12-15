@@ -36,6 +36,14 @@ pipeline {
             always {
                 archiveArtifacts artifacts: 'tflint.xml', fingerprint: true
             }
+
+            success {
+                discordSend description: "TFLint stage", footer: "TFLint scann successful", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
+  
+            failure {
+                discordSend description: "TFLint stage", footer: "TFLint scan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
         }
     }
 
@@ -61,6 +69,14 @@ pipeline {
         post {
             always {
                 archiveArtifacts artifacts: 'checkov_scan.xml', fingerprint: true
+            }
+
+            success {
+                discordSend description: "Checkov Scan stage", footer: "Checkov Scan success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
+  
+            failure {
+                discordSend description: "Checkov Scan stage", footer: "Checkov Scan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
             }
         }
     }
@@ -89,6 +105,14 @@ pipeline {
             always {
                 archiveArtifacts artifacts: 'terrascan.xml', fingerprint: true
             }
+
+            success {
+                discordSend description: "Terrascan stage", footer: "Terrascan success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
+  
+            failure {
+                discordSend description: "Terrascan stage", footer: "Terrascan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
         }
     }
 
@@ -110,6 +134,14 @@ pipeline {
             always {
                 archiveArtifacts artifacts: 'terraform.diff', fingerprint: true
             }
+
+            success {
+                discordSend description: "Terraform fmt stage", footer: "Terraform fmt success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
+  
+            failure {
+                discordSend description: "Terraform fmt stage", footer: "Terrascan fmt failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
         }
     }
 
@@ -122,6 +154,16 @@ pipeline {
                     echo "An error occured: ${e}"
                 }
                 
+            }
+        }
+
+        post {
+            success {
+                discordSend description: "Docker Build Stage", footer: "Docker Build success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+            }
+  
+            failure {
+                discordSend description: "Docker Build Stage", footer: "Docker Build failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
             }
         }
     }
@@ -141,8 +183,16 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'trivy.json', fingerprint: true
         }
+
+        success {
+            discordSend description: "Trivy Scan Stage", footer: "Trivy Scan success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+  
+        failure {
+            discordSend description: "Trivy Scan Stage", footer: "Trivy Scan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        } 
     }
-    }
+}
 
 stage('Clair Scan') {
    steps {
@@ -160,6 +210,14 @@ stage('Clair Scan') {
        always {
           archiveArtifacts artifacts: 'clair.json', fingerprint: true
        }
+
+        success {
+            discordSend description: "Clair Scan Stage", footer: "Clair Scan success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+
+        failure {
+            discordSend description: "Clair Scan Stage", footer: "Clair Scan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
    }
 }
     stage('Push') {
@@ -175,6 +233,16 @@ stage('Clair Scan') {
                 }
             }
         }
+
+    post {
+        success {
+            discordSend description: "Docker Push Stage", footer: "Docker Push success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+
+        failure {
+            discordSend description: "Docker Push Stage", footer: "Docker Push failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+   }
     }
 
     stage('ZAP Scan') {
@@ -193,17 +261,17 @@ stage('Clair Scan') {
             always {
                archiveArtifacts artifacts: 'zap.html', fingerprint: true
             }
+
+        success {
+            discordSend description: "Zap Scan Stage", footer: "Zap Scan success", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
+
+        failure {
+            discordSend description: "Zap Scan Stage", footer: "Zap scan failed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
+        }
         }
     }
  }
-
-    post {
-        always {
-            echo "Pipeline completed"
-            // Your post-pipeline actions go here
-            discordSend description: "Jenkins Pipeline Build", footer: "Pipeline completed", link: env.BUILD_URL, result: currentBuild.currentResult, title: JOB_NAME, webhookURL: "$DISCORD_WEBHOOK"
-        }
-    }
 
    options {
          preserveStashes()
